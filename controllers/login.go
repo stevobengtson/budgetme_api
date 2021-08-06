@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stevobengtson/budgetme_api/auth"
-	"github.com/stevobengtson/budgetme_api/models"
+	"github.com/stevobengtson/user_service/auth"
+	"github.com/stevobengtson/user_service/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,6 +24,19 @@ func Login(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func Refresh(c *gin.Context) {
+	currentUser := c.Value("currentUser").(models.User)
+
+	token, err := auth.CreateToken(currentUser.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
@@ -40,5 +53,5 @@ func SignIn(email, password string) (string, error) {
 		return "", err
 	}
 
-	return auth.CreateToken(user.Id)
+	return auth.CreateToken(user.ID)
 }

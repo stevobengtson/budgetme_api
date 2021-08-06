@@ -4,8 +4,17 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/stevobengtson/budgetme_api/config"
+	"github.com/stevobengtson/user_service/config"
 )
+
+func GetAllUsersPaged(users *[]User, pagination *Pagination) (err error) {
+	offset := (pagination.Page - 1) * pagination.Limit
+	queryBuider := config.DB.Limit(pagination.Limit).Offset(offset).Order(pagination.Sort)
+	if err = queryBuider.Model(&User{}).Find(&users).Error; err != nil {
+		return err
+	}
+	return nil
+}
 
 //GetAllUsers Fetch all user data
 func GetAllUsers(user *[]User) (err error) {

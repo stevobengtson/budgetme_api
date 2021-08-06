@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -9,21 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateToken(user_id uint) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["user_id"] = user_id
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(os.Getenv("API_SECRET")))
+type JwtCustomClaims struct {
+	UserId uint `json:"user_id"`
+	jwt.StandardClaims
 }
 
-func TokenValid(tokenString string) (*jwt.Token, error) {
-	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(os.Getenv("API_SECRET")), nil
-	})
+func CreateToken(user_id uint) (string, error) {
+	var claims JwtCustomClaims
+	claims.UserId = user_id
+	claims.ExpiresAt = time.Now().Add(time.Hour * 1).Unix()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(os.Getenv("BUDGETME_USER_API_SECRET")))
 }
 
 func ExtractToken(c *gin.Context) (string, error) {
@@ -32,4 +29,27 @@ func ExtractToken(c *gin.Context) (string, error) {
 		return authHeader[len(BEARER_SCHEMA)+1:], nil
 	}
 	return "", fmt.Errorf("unauthorized")
+}
+
+func IsTokenValid(c *gin.Context) (uint, error) {
+	var tokenString string
+	var err error
+
+	if tokenString, err = ExtractToken(c); err != nil {
+		return 0, errors.New("invalid token")
+	}
+
+	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("BUDGETME_USER_API_SECRET")), nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	if claims, ok := token.Claims.(*JwtCustomClaims); ok && token.Valid {
+		return claims.UserId, nil
+	}
+
+	return 0, errors.New("unable to extract token")
 }

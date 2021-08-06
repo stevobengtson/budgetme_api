@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/stevobengtson/budgetme_api/controllers"
-	"github.com/stevobengtson/budgetme_api/middleware"
+	"github.com/stevobengtson/user_service/controllers"
+	"github.com/stevobengtson/user_service/middleware"
 )
 
 func SetupRouter() *gin.Engine {
@@ -12,6 +12,7 @@ func SetupRouter() *gin.Engine {
 	loginGrp := r.Group("/auth")
 	{
 		loginGrp.POST("/", controllers.Login)
+		loginGrp.PUT("/refresh", middleware.AuthorizeJWT(), controllers.Refresh)
 	}
 
 	grp1 := r.Group("/user")

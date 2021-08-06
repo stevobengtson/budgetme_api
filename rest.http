@@ -23,7 +23,7 @@ Authorization: Bearer {{token}}
 # @name CreateUser
 
 POST {{host}}/user
-Content-Type: application/application/json
+Content-Type: application/json
 
 {
     "name": "Steven",
@@ -62,9 +62,19 @@ Authorization: Bearer {{token}}
 # @name Login
 
 POST {{host}}/auth
-Content-Type: application/application/json
+Content-Type: application/json
 
 {
     "email": "steven_1@test.com",
     "password": "test1234"
 }
+
+###
+
+# @name RefreshToken
+
+PUT {{host}}/auth/refresh
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{}

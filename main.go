@@ -2,16 +2,20 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/jinzhu/gorm"
-	"github.com/stevobengtson/budgetme_api/config"
-	"github.com/stevobengtson/budgetme_api/middleware"
-	"github.com/stevobengtson/budgetme_api/models"
-	"github.com/stevobengtson/budgetme_api/routes"
+	"github.com/joho/godotenv"
+	"github.com/stevobengtson/user_service/config"
+	"github.com/stevobengtson/user_service/middleware"
+	"github.com/stevobengtson/user_service/models"
+	"github.com/stevobengtson/user_service/routes"
 )
 
 func main() {
 	var err error
+	godotenv.Load()
+
 	config.DB, err = gorm.Open("mysql", config.DbURL(config.BuildDBConfig()))
 	if err != nil {
 		fmt.Println("Status:", err)
@@ -22,5 +26,5 @@ func main() {
 	r := routes.SetupRouter()
 	middleware.SetupCors(r)
 	middleware.SetupHealthcheck(r)
-	r.Run(":8080")
+	r.Run(fmt.Sprintf("0.0.0.0:%s", os.Getenv("BUDGETME_USER_API_LISTEN_PORT")))
 }

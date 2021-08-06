@@ -5,19 +5,20 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/stevobengtson/budgetme_api/models"
+	"github.com/stevobengtson/user_service/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 //GetUsers ... Get all users
 func GetUsers(c *gin.Context) {
-	var user []models.User
-	err := models.GetAllUsers(&user)
+	var users []models.User
+	pagination := models.GeneratePaginationFromRequest(c)
+	err := models.GetAllUsersPaged(&users, &pagination)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, users)
 	}
 }
 
@@ -48,14 +49,16 @@ func UpdateUser(c *gin.Context) {
 	user, err := getUserFromParams(c)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	}
 
-	if currentUser := c.Value("currentUser").(models.User); currentUser.Id != user.Id {
+	if currentUser := c.Value("currentUser").(models.User); currentUser.ID != user.ID {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unable to update other users"})
+		return
 	}
 
 	c.BindJSON(&user)
-	err = models.UpdateUser(&user, fmt.Sprint(user.Id))
+	err = models.UpdateUser(&user, fmt.Sprint(user.ID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -68,13 +71,15 @@ func DeleteUser(c *gin.Context) {
 	user, err := getUserFromParams(c)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
+		return
 	}
 
-	if currentUser := c.Value("currentUser").(models.User); currentUser.Id != user.Id {
+	if currentUser := c.Value("currentUser").(models.User); currentUser.ID != user.ID {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unable to delete other users"})
+		return
 	}
 
-	err = models.DeleteUser(&user, fmt.Sprint(user.Id))
+	err = models.DeleteUser(&user, fmt.Sprint(user.ID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {

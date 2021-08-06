@@ -3,7 +3,6 @@ package middleware
 import (
 	"time"
 
-	healthcheck "github.com/RaMin0/gin-health-check"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -20,8 +19,4 @@ func SetupCors(r *gin.Engine) {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
-}
-
-func SetupHealthcheck(r *gin.Engine) {
-	r.Use(healthcheck.Default())
 }

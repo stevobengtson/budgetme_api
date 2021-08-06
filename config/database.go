@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/jinzhu/gorm"
 )
@@ -11,7 +12,7 @@ var DB *gorm.DB
 // DBConfig represents db configuration
 type DBConfig struct {
 	Host     string
-	Port     int
+	Port     string
 	User     string
 	DBName   string
 	Password string
@@ -19,18 +20,18 @@ type DBConfig struct {
 
 func BuildDBConfig() *DBConfig {
 	dbConfig := DBConfig{
-		Host:     "localhost",
-		Port:     3306,
-		User:     "budgetme",
-		Password: "Budg3tM3!",
-		DBName:   "budget_me",
+		Host:     os.Getenv("BUDGETME_USER_API_DB_HOST"),
+		Port:     os.Getenv("BUDGETME_USER_API_DB_PORT"),
+		User:     os.Getenv("BUDGETME_USER_API_DB_USER"),
+		Password: os.Getenv("BUDGETME_USER_API_DB_PASSWORD"),
+		DBName:   os.Getenv("BUDGETME_USER_API_DB_NAME"),
 	}
 	return &dbConfig
 }
 
 func DbURL(dbConfig *DBConfig) string {
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,

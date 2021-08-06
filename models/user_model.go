@@ -7,16 +7,15 @@ import (
 	"time"
 
 	"github.com/badoux/checkmail"
+	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Id        uint      `gorm:"primary_key;auto_increment" json:"id"`
-	Name      string    `gorm:"size:255;not null;" json:"name"`
-	Email     string    `gorm:"size:255;not null;" json:"email"`
-	Password  string    `gorm:"size:100;not null;" json:"password"`
-	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+	gorm.Model
+	Name     string `gorm:"size:255;not null;" json:"name"`
+	Email    string `gorm:"size:255;not null;" json:"email"`
+	Password string `gorm:"size:100;not null;" json:"password"`
 }
 
 func (b *User) TableName() string {
@@ -41,7 +40,7 @@ func (u *User) BeforeSave() error {
 }
 
 func (u *User) Prepare() {
-	u.Id = 0
+	u.ID = 0
 	u.Name = html.EscapeString(strings.TrimSpace(u.Name))
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
 	u.CreatedAt = time.Now()
