@@ -4,8 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stevobengtson/user_service/auth"
-	"github.com/stevobengtson/user_service/models"
+	"github.com/stevobengtson/budgetme/auth"
+	"github.com/stevobengtson/budgetme/models"
+	"github.com/stevobengtson/budgetme/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -43,7 +44,7 @@ func Refresh(c *gin.Context) {
 func SignIn(email, password string) (string, error) {
 	var user models.User
 
-	err := models.GetUserByEmail(&user, email)
+	err := repository.GetUserByEmail(&user, email)
 	if err != nil {
 		return "", err
 	}

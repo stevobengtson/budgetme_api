@@ -4,8 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stevobengtson/user_service/auth"
-	"github.com/stevobengtson/user_service/models"
+	"github.com/stevobengtson/budgetme/auth"
+	"github.com/stevobengtson/budgetme/models"
+	"github.com/stevobengtson/budgetme/repository"
 )
 
 func AuthorizeJWT() gin.HandlerFunc {
@@ -19,7 +20,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 			return
 		}
 
-		if err = models.GetUserByID(&user, userId); err != nil {
+		if err = repository.GetUserByID(&user, userId); err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

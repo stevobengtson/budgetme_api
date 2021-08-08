@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/stevobengtson/user_service/models"
+	"github.com/stevobengtson/budgetme/models"
+	"github.com/stevobengtson/budgetme/repository"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,7 @@ import (
 func GetUsers(c *gin.Context) {
 	var users []models.User
 	pagination := models.GeneratePaginationFromRequest(c)
-	err := models.GetAllUsersPaged(&users, &pagination)
+	err := repository.GetAllUsersPaged(&users, &pagination)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -26,7 +27,7 @@ func GetUsers(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user models.User
 	c.BindJSON(&user)
-	err := models.CreateUser(&user)
+	err := repository.CreateUser(&user)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -58,7 +59,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	c.BindJSON(&user)
-	err = models.UpdateUser(&user, fmt.Sprint(user.ID))
+	err = repository.UpdateUser(&user, fmt.Sprint(user.ID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -79,7 +80,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	err = models.DeleteUser(&user, fmt.Sprint(user.ID))
+	err = repository.DeleteUser(&user, fmt.Sprint(user.ID))
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
@@ -98,7 +99,7 @@ func getUserFromParams(c *gin.Context) (models.User, error) {
 		return user, err
 	}
 
-	err = models.GetUserByID(&user, uint(userId))
+	err = repository.GetUserByID(&user, uint(userId))
 	if err != nil {
 		return user, err
 	}

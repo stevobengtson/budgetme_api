@@ -6,10 +6,10 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
-	"github.com/stevobengtson/user_service/config"
-	"github.com/stevobengtson/user_service/middleware"
-	"github.com/stevobengtson/user_service/models"
-	"github.com/stevobengtson/user_service/routes"
+	"github.com/stevobengtson/budgetme/config"
+	"github.com/stevobengtson/budgetme/middleware"
+	"github.com/stevobengtson/budgetme/models"
+	"github.com/stevobengtson/budgetme/routes"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 		fmt.Println("Status:", err)
 	}
 	defer config.DB.Close() // Close the database connection when this function completes
-	config.DB.AutoMigrate(&models.User{})
+	config.DB.AutoMigrate(&models.User{}, &models.Account{})
 
 	r := routes.SetupRouter()
 	middleware.SetupCors(r)

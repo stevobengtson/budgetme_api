@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/stevobengtson/user_service/controllers"
-	"github.com/stevobengtson/user_service/middleware"
+	"github.com/stevobengtson/budgetme/controllers"
+	"github.com/stevobengtson/budgetme/middleware"
 )
 
 func SetupRouter() *gin.Engine {
@@ -15,13 +15,25 @@ func SetupRouter() *gin.Engine {
 		loginGrp.PUT("/refresh", middleware.AuthorizeJWT(), controllers.Refresh)
 	}
 
-	grp1 := r.Group("/user")
+	userGroup := r.Group("/user")
 	{
-		grp1.GET("/", middleware.AuthorizeJWT(), controllers.GetUsers)
-		grp1.POST("/", controllers.CreateUser)
-		grp1.GET("/:id", middleware.AuthorizeJWT(), controllers.GetUserByID)
-		grp1.PUT("/:id", middleware.AuthorizeJWT(), controllers.UpdateUser)
-		grp1.DELETE("/:id", middleware.AuthorizeJWT(), controllers.DeleteUser)
+		userGroup.GET("/", middleware.AuthorizeJWT(), controllers.GetUsers)
+		userGroup.POST("/", controllers.CreateUser)
+		userGroup.GET("/:id", middleware.AuthorizeJWT(), controllers.GetUserByID)
+		userGroup.PUT("/:id", middleware.AuthorizeJWT(), controllers.UpdateUser)
+		userGroup.DELETE("/:id", middleware.AuthorizeJWT(), controllers.DeleteUser)
 	}
+
+	accountGrp := r.Group("/account")
+	{
+		accountGrp.GET("/", middleware.AuthorizeJWT(), controllers.GetAccounts)
+		accountGrp.POST("/", middleware.AuthorizeJWT(), controllers.CreateAccount)
+	}
+
+	devGroup := r.Group("/dev")
+	{
+		devGroup.GET("/seed", controllers.SeedData)
+	}
+
 	return r
 }
